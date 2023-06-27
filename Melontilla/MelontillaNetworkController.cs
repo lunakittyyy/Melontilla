@@ -12,7 +12,7 @@ using ExitGames.Client.Photon;
 
 namespace Melontilla
 {
-    public class UtillaNetworkController : MonoBehaviourPunCallbacks
+    public class MelontillaNetworkController : MonoBehaviourPunCallbacks
     {
         [Serializable]
         public class DataClass

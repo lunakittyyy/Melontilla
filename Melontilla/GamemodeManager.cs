@@ -90,7 +90,7 @@ namespace Melontilla
             }
             catch (Exception e)
             {
-                Debug.LogError($"Utilla: Failed to initialize {name}: {e}");
+                Debug.LogError($"Melontilla: Failed to initialize {name}: {e}");
             }
 
         }

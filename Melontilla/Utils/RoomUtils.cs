@@ -103,7 +103,7 @@ namespace Melontilla.Utils
             //photonNetworkController.currentGameType = gameModeName;
             if (joinTrigger == null)
             {
-                joinTrigger = new GameObject("UtillaJoinTrigger").AddComponent<GorillaNetworkJoinTrigger>();
+                joinTrigger = new GameObject("MelontillaJoinTrigger").AddComponent<GorillaNetworkJoinTrigger>();
                 joinTrigger.makeSureThisIsDisabled = Array.Empty<GameObject>();
                 joinTrigger.makeSureThisIsEnabled = Array.Empty<GameObject>();
                 joinTrigger.joinScreens = Array.Empty<GorillaLevelScreen>();

@@ -31,9 +31,9 @@ namespace Melontilla
             LoggerInstance.Msg("making melontilla dontdestroyonload");
             UnityEngine.Object.DontDestroyOnLoad(MelonTillaHome);
             LoggerInstance.Msg("adding network controller");
-            MelonTillaHome.AddComponent<UtillaNetworkController>();
+            MelonTillaHome.AddComponent<MelontillaNetworkController>();
 
-            UtillaNetworkController.events = events;
+            MelontillaNetworkController.events = events;
             PostInitializedPatch.events = events;
 
             // MelonLoader automatically applies all patches
@@ -44,7 +44,7 @@ namespace Melontilla
             LoggerInstance.Msg("adding gamemode manager");
             var gmm = go.AddComponent<GamemodeManager>();
             LoggerInstance.Msg("setting melontilla's networkcontroller gamemode manager to the one we added");
-            MelonTillaHome.GetComponent<UtillaNetworkController>().gameModeManager = gmm;
+            MelonTillaHome.GetComponent<MelontillaNetworkController>().gameModeManager = gmm;
         }
     }
 }
