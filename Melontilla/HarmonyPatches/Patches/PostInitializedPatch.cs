@@ -3,6 +3,7 @@ using HarmonyLib;
 using System.Collections;
 using System.Threading.Tasks;
 using Melontilla;
+using MelonLoader;
 
 namespace Melontilla.HarmonyPatches
 {
@@ -14,6 +15,7 @@ namespace Melontilla.HarmonyPatches
 
         private static void Postfix()
         {
+            Melon<MelontillaMod>.Logger.Msg("init postfix running");
             // await Task.Yield();
             events.TriggerGameInitialized();
         }

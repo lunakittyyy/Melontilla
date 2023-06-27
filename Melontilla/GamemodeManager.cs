@@ -115,16 +115,19 @@ namespace Melontilla
 
             return gamemodes;
         }
-
+        
         List<PluginInfo> GetPluginInfos()
         {
             List<PluginInfo> infos = new List<PluginInfo>();
+            /* Used for custom gamemodes I'll come back to this later
             foreach (var melonPlugin in MelonLoader.MelonPlugin.RegisteredMelons)
             {
+                
                 if (melonPlugin.Info == null) continue;
                 MelonMod plugin = melonPlugin.Value.Instance;
                 if (plugin == null) continue;
                 Type type = plugin.GetType();
+
 
                 IEnumerable<Gamemode> gamemodes = GetGamemodes(type);
 
@@ -139,7 +142,7 @@ namespace Melontilla
                     });
                 }
             }
-
+            */
             return infos;
         }
 

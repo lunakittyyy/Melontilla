@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 using GorillaNetworking;
+using MelonLoader;
 
 namespace Melontilla.HarmonyPatches
 {
@@ -10,6 +11,7 @@ namespace Melontilla.HarmonyPatches
     {
         private static void Prefix(PhotonNetworkController __instance, out string[] __state)
         {
+            Melon<MelontillaMod>.Logger.Msg("join patch prefix running");
             __state = GorillaComputer.instance.allowedMapsToJoin;
 
             var newMaps = new string[__state.Length + 1];
@@ -21,6 +23,7 @@ namespace Melontilla.HarmonyPatches
 
         private static void Postfix(string[] __state)
         {
+            Melon<MelontillaMod>.Logger.Msg("join patch postfix running");
             GorillaComputer.instance.allowedMapsToJoin = __state;
         }
     }

@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using GorillaNetworking;
 using HarmonyLib;
+using MelonLoader;
 using Photon.Pun;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ namespace Melontilla.HarmonyPatches
 
         private static bool Prefix(PhotonNetworkController __instance, PhotonNetworkController.ConnectionEvent connectionEvent, ref bool ___joiningWithFriend, ref bool ___pastFirstConnection, ref int[] ___playersInRegion)
         {
+            Melon<MelontillaMod>.Logger.Msg("matchmaking prefix running");
             switch (connectionEvent)
             {
                 // Attempting to join a room, try and join a random room ignoring used regions

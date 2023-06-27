@@ -356,7 +356,6 @@
     <Compile Include="Attributes\ModdedGamemodeAttribute.cs" />
     <Compile Include="Attributes\ModdedGamemodeJoinAttribute.cs" />
     <Compile Include="Attributes\ModdedGamemodeLeaveAttribute.cs" />
-    <Compile Include="Class1.cs" />
     <Compile Include="Events\EventHandlerExtensions.cs" />
     <Compile Include="Events\Events.cs" />
     <Compile Include="GamemodeManager.cs" />

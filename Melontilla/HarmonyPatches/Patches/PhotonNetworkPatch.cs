@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
+using MelonLoader;
 using Photon.Pun;
+using UnityEngine;
 
 namespace Melontilla.HarmonyPatches
 {
@@ -11,6 +13,7 @@ namespace Melontilla.HarmonyPatches
 
         private static void Prefix(ref Photon.Realtime.RoomOptions roomOptions)
         {
+            Melon<MelontillaMod>.Logger.Msg("photon prefix running");
             if (setCasualPrivate)
             {
                 if (roomOptions.CustomRoomProperties["gameMode"] as string == "private")

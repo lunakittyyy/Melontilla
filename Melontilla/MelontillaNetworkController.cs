@@ -97,13 +97,6 @@ namespace Melontilla
 
             lastRoom = args;
 
-            var table = new Hashtable();
-            var mods = new DataClass();
-            mods.installedIDs = MelonLoader.MelonPlugin.RegisteredMelons.ToString();
-            mods.assemblyHash = AssemblyHash;
-            table.Add("mods", JsonUtility.ToJson(mods));
-            PhotonNetwork.LocalPlayer.SetCustomProperties(table);
-
             RoomUtils.ResetQueue();
         }
 

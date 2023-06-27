@@ -13,18 +13,29 @@ namespace Melontilla
     public class MelontillaMod : MelonMod
     {
         static Events events = new Events();
-        GameObject MelonTillaHome;
+        public static GameObject MelonTillaHome;
 
         public override void OnInitializeMelon()
         {
+
+        }
+
+        public override void OnLateInitializeMelon()
+        {
+            LoggerInstance.Msg("gening random roomcode");
             RoomUtils.RoomCode = RoomUtils.RandomString(6); // Generate a random room code in case we need it
 
-            GameObject MelonTillaHome = new GameObject();
+            LoggerInstance.Msg("creating data object");
             GameObject dataObject = new GameObject();
-            UnityEngine.Object.DontDestroyOnLoad(dataObject);
-            MelonTillaHome.AddComponent<UtillaNetworkController>();
+            LoggerInstance.Msg("creating a home for melontilla to be happy in");
+            MelonTillaHome = new GameObject("Melontilla");
 
-            Events.GameInitialized += PostInitialized;
+            LoggerInstance.Msg("making dataobject dontdestroyonload");
+            UnityEngine.Object.DontDestroyOnLoad(dataObject);
+            LoggerInstance.Msg("making melontilla dontdestroyonload");
+            UnityEngine.Object.DontDestroyOnLoad(MelonTillaHome);
+            LoggerInstance.Msg("adding network controller");
+            MelonTillaHome.AddComponent<UtillaNetworkController>();
 
             UtillaNetworkController.events = events;
             PostInitializedPatch.events = events;
@@ -32,12 +43,11 @@ namespace Melontilla
             // MelonLoader automatically applies all patches
             // so calling a patching method is unneeded
             // UtillaPatches.ApplyHarmonyPatches();
-        }
-
-        void PostInitialized(object sender, EventArgs e)
-        {
+            LoggerInstance.Msg("creating gamemode manager object");
             var go = new GameObject("CustomGamemodesManager");
+            LoggerInstance.Msg("adding gamemode manager");
             var gmm = go.AddComponent<GamemodeManager>();
+            LoggerInstance.Msg("setting melontilla's networkcontroller gamemode manager to the one we added");
             MelonTillaHome.GetComponent<UtillaNetworkController>().gameModeManager = gmm;
         }
     }
