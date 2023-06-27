@@ -15,13 +15,9 @@ namespace Melontilla
         static Events events = new Events();
         public static GameObject MelonTillaHome;
 
-        public override void OnInitializeMelon()
-        {
-
-        }
-
         public override void OnLateInitializeMelon()
         {
+            LoggerInstance.Warning("Melontilla is highly WIP and experimental. Melontilla is provided 'as is' without warranty of any kind. The authors are not liable for any nasty issues like bans that Melontilla may cause.");
             LoggerInstance.Msg("gening random roomcode");
             RoomUtils.RoomCode = RoomUtils.RandomString(6); // Generate a random room code in case we need it
 

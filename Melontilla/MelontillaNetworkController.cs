@@ -26,7 +26,7 @@ namespace Melontilla
         public static Events events;
 
         Events.RoomJoinedArgs lastRoom;
-
+        /*
         private string assemblyHash;
         private string AssemblyHash
         {
@@ -43,7 +43,7 @@ namespace Melontilla
                 }
             }
         }
-
+        */
         public GamemodeManager gameModeManager;
 
         public override void OnJoinedRoom()
@@ -99,7 +99,7 @@ namespace Melontilla
 
             RoomUtils.ResetQueue();
         }
-
+        /*
         private string GetAssemblyHash()
         {
             string hash = "";
@@ -116,7 +116,7 @@ namespace Melontilla
 
             return hash;
         }
-
+        */
         public override void OnLeftRoom()
         {
             if (lastRoom != null)
@@ -140,7 +140,6 @@ namespace Melontilla
 
             lastRoom.Gamemode = gameMode;
             lastRoom.isPrivate = PhotonNetwork.CurrentRoom.IsVisible;
-
         }
     }
 }
