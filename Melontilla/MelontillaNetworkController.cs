@@ -99,7 +99,7 @@ namespace Melontilla
 
             RoomUtils.ResetQueue();
         }
-        /*
+        /* causing issues finding the assembly path even though it never changes?
         private string GetAssemblyHash()
         {
             string hash = "";
