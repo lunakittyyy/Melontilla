@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.Linq;
 using GorillaNetworking;
 using Melontilla.Models;
+using UnityEngine.Events;
 using static Cinemachine.CinemachineTriggerAction.ActionSettings;
 
 namespace Melontilla
@@ -45,7 +46,7 @@ namespace Melontilla
             cube.SetActive(false);
             MeshFilter meshFilter = cube.GetComponent<MeshFilter>();
 
-            GameObject CreatePageButton(string text, Action onPressed)
+            GameObject CreatePageButton(string text, UnityAction onPressed)
             {
                 GameObject button = GameObject.Instantiate(templateButton.transform.childCount == 0 ? fallbackTemplateButton : templateButton);
                 button.GetComponent<MeshFilter>().mesh = meshFilter.mesh;
@@ -62,8 +63,11 @@ namespace Melontilla
                     buttonText.transform.localScale = Vector3.Scale(buttonText.transform.localScale, new Vector3(2, 2, 1));
                 }
 
+                UnityEvent buttonEvent = new UnityEvent();
+                buttonEvent.AddListener(onPressed);
+
                 GameObject.Destroy(button.GetComponent<ModeSelectButton>());
-                button.AddComponent<PageButton>().onPressed += onPressed;
+                button.AddComponent<GorillaPressableButton>().onPressButton = buttonEvent;
 
                 if (!button.GetComponentInParent<Canvas>())
                 {

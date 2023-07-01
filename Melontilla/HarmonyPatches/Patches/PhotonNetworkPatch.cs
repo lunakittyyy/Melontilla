@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿
+using HarmonyLib;
 using MelonLoader;
 using Photon.Pun;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace Melontilla.HarmonyPatches
     {
         public static bool setCasualPrivate = false;
 
+        /*
         private static void Prefix(ref Photon.Realtime.RoomOptions roomOptions)
         {
             Melon<MelontillaMod>.Logger.Msg("photon prefix running");
@@ -24,6 +26,6 @@ namespace Melontilla.HarmonyPatches
                 setCasualPrivate = false;
             }
         }
+        */
     }
 }
-
