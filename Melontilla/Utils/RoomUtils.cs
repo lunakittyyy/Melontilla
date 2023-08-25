@@ -8,7 +8,7 @@ using System.Reflection;
 using Melontilla.HarmonyPatches;
 using GorillaNetworking;
 using MelonLoader;
-using Sirenix.Utilities;
+// using Sirenix.Utilities;
 
 namespace Melontilla.Utils
 {
@@ -115,7 +115,7 @@ namespace Melontilla.Utils
 
         internal static void ResetQueue()
         {
-            if (!defaultQueue.IsNullOrWhitespace())
+            if (defaultQueue != null && defaultQueue != "")
             {
                 GorillaComputer.instance.currentQueue = RoomUtils.defaultQueue;
                 defaultQueue = null;
