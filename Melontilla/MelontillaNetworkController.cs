@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using HarmonyLib;
+using MelonLoader;
 using System.Reflection;
 using Photon.Pun;
 using UnityEngine;
@@ -14,36 +15,10 @@ namespace Melontilla
 {
     public class MelontillaNetworkController : MonoBehaviourPunCallbacks
     {
-        [Serializable]
-        public class DataClass
-        {
-            public string[] installedIDs;
-            public string[] known;
-            public string assemblyHash;
-
-        }
-
         public static Events events;
 
         Events.RoomJoinedArgs lastRoom;
-        /*
-        private string assemblyHash;
-        private string AssemblyHash
-        {
-            get
-            {
-                if (assemblyHash != null)
-                {
-                    return assemblyHash;
-                }
-                else
-                {
-                    assemblyHash = GetAssemblyHash();
-                    return assemblyHash;
-                }
-            }
-        }
-        */
+
         public GamemodeManager gameModeManager;
 
         public override void OnJoinedRoom()
@@ -86,7 +61,7 @@ namespace Melontilla
                     }
                 }
             }
-            GorillaComputer.instance.currentGameModeText.text = "CURRENT MODE\n" + prefix;
+            GorillaComputer.instance.currentGameModeText.Value = "CURRENT MODE\n" + prefix;
 
             Events.RoomJoinedArgs args = new Events.RoomJoinedArgs
             {
@@ -99,24 +74,7 @@ namespace Melontilla
 
             RoomUtils.ResetQueue();
         }
-        /* causing issues finding the assembly path even though it never changes?
-        private string GetAssemblyHash()
-        {
-            string hash = "";
-            string hashPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
 
-            hashPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(hashPath, @"../../../../Gorilla Tag_Data/Managed/Assembly-CSharp.dll"));
-
-            byte[] assemblyBytes = System.IO.File.ReadAllBytes(hashPath);
-
-            System.Security.Cryptography.SHA256 sha = System.Security.Cryptography.SHA256.Create();
-
-            byte[] ShaByte = sha.ComputeHash(assemblyBytes);
-            hash = System.Convert.ToBase64String(ShaByte);
-
-            return hash;
-        }
-        */
         public override void OnLeftRoom()
         {
             if (lastRoom != null)
@@ -125,7 +83,7 @@ namespace Melontilla
                 lastRoom = null;
             }
 
-            GorillaComputer.instance.currentGameModeText.text = "CURRENT MODE\n-NOT IN ROOM-";
+            GorillaComputer.instance.currentGameModeText.Value = "CURRENT MODE\n-NOT IN ROOM-";
         }
 
         public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
@@ -140,6 +98,7 @@ namespace Melontilla
 
             lastRoom.Gamemode = gameMode;
             lastRoom.isPrivate = PhotonNetwork.CurrentRoom.IsVisible;
+
         }
     }
 }

@@ -1,14 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
-using GorillaNetworking;
-using MelonLoader;
 using System.Reflection;
 using System.Linq.Expressions;
-using Photon.Pun;
+using System.Collections.Generic;
+
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+using GorillaNetworking;
+using MelonLoader;
+using HarmonyLib;
+
 using Melontilla.Models;
-using static Cinemachine.CinemachineTriggerAction.ActionSettings;
+using Melontilla;
 
 namespace Melontilla
 {
@@ -34,7 +38,77 @@ namespace Melontilla
             new Gamemode("BATTLE", "PAINTBRAWL")
         };
 
-        List<PluginInfo> pluginInfos;
+        List<ModInfo> modInfos;
+
+        FieldInfo fiGameModeInstance = typeof(GameMode).GetField("instance", BindingFlags.Static | BindingFlags.NonPublic);
+        GameMode gtGameModeInstance;
+
+        FieldInfo fiGameModeTable = typeof(GameMode).GetField("gameModeTable", BindingFlags.Static | BindingFlags.NonPublic);
+        Dictionary<int, GorillaGameManager> gtGameModeTable;
+
+        FieldInfo fiGameModeKeyByName = typeof(GameMode).GetField("gameModeKeyByName", BindingFlags.Static | BindingFlags.NonPublic);
+        Dictionary<string, int> gtGameModeKeyByName;
+
+        FieldInfo fiGameModes = typeof(GameMode).GetField("gameModes", BindingFlags.Static | BindingFlags.NonPublic);
+        List<GorillaGameManager> gtGameModes;
+
+        List<string> gtGameModeNames;
+
+        GameObject moddedGameModesObject;
+
+        struct GameModeSelectorPath
+        {
+            public string name;
+            public string buttonPath;
+            public string gamemodesPath;
+            public string transformToFind;
+        }
+
+        Dictionary<string, GameModeSelectorPath> gameModeButtonsDict = new Dictionary<string, GameModeSelectorPath>() {
+            {
+                "GorillaTag",
+                new GameModeSelectorPath() {
+                    name = "TreehouseSelector",
+                    buttonPath = "anchor",
+                    gamemodesPath = "anchor",
+                    transformToFind = "Environment Objects/LocalObjects_Prefab/TreeRoom/TreeRoomInteractables/UI/Selector Buttons"
+                }
+            },
+            {
+                "Beach",
+                new GameModeSelectorPath() {
+                    name = "BeachSelector",
+                    buttonPath = "modeselectbox (3)/anchor",
+                    gamemodesPath = "UI FOR BEACH COMPUTER",
+                    transformToFind = "Beach/BeachComputer"
+                }
+            },
+            {   "Mountain",
+                new GameModeSelectorPath() {
+                    name = "MountainSelector",
+                    buttonPath = "Geometry/goodigloo/modeselectbox (1)/anchor",
+                    gamemodesPath = "UI/Text",
+                    transformToFind = "Mountain"
+                }
+            },
+            {   "Skyjungle",
+                new GameModeSelectorPath() {
+                    name = "SkySelector",
+                    buttonPath = "anchor",
+                    gamemodesPath = "ModeSelectorText",
+                    transformToFind = "skyjungle/UI/-- Clouds ModeSelectBox UI --"
+                }
+            },
+            {
+                "Rotating",
+                new GameModeSelectorPath() {
+                    name = "RotatingSelector",
+                    buttonPath = "anchor",
+                    gamemodesPath = "ModeSelectorText",
+                    transformToFind = "RotatingMap/SwampLevel/UI (1)/-- Rotating ModeSelectBox UI --"
+                }
+            }
+        };
 
         void Start()
         {
@@ -42,30 +116,46 @@ namespace Melontilla
             Events.RoomJoined += OnRoomJoin;
             Events.RoomLeft += OnRoomLeft;
 
+            gtGameModeInstance = fiGameModeInstance.GetValue(null) as GameMode;
+            gtGameModeTable = fiGameModeTable.GetValue(null) as Dictionary<int, GorillaGameManager>;
+            gtGameModeKeyByName = fiGameModeKeyByName.GetValue(null) as Dictionary<string, int>;
+            gtGameModes = fiGameModes.GetValue(null) as List<GorillaGameManager>;
+            gtGameModeNames = GameMode.gameModeNames;
+
+            moddedGameModesObject = new GameObject("Modded Game Modes");
+            moddedGameModesObject.transform.SetParent(gtGameModeInstance.gameObject.transform);
             // transform.parent = GameObject.Find(UIRootPath).transform;
 
-            GorillaComputer.instance.currentGameMode = PlayerPrefs.GetString("currentGameMode", "INFECTION");
+            GorillaComputer.instance.currentGameMode.Value = PlayerPrefs.GetString("currentGameMode", "INFECTION");
 
-            pluginInfos = GetPluginInfos();
+            modInfos = GetModInfos();
 
-            Gamemodes.AddRange(GetGamemodes(pluginInfos));
+            Gamemodes.AddRange(GetGamemodes(modInfos));
             Gamemodes.ForEach(gamemode => AddGamemodeToPrefabPool(gamemode));
 
-            InitializeSelector("TreehouseSelector", "Environment Objects/LocalObjects_Prefab/TreeRoom/TreeRoomInteractables/UI", "Selector Buttons/anchor", "Selector Buttons/anchor");
-            InitializeSelector("MountainSelector", "Environment Objects/LocalObjects_Prefab/Mountain", "Geometry/goodigloo/modeselectbox (1)/anchor", "UI/Text");
-            InitializeSelector("SkySelector", "Environment Objects/LocalObjects_Prefab/skyjungle/UI/-- Clouds ModeSelectBox UI --/", "anchor", "ModeSelectorText");
-            InitializeSelector("BeachSelector", "Environment Objects/LocalObjects_Prefab/Beach/BeachComputer/", "modeselectbox (3)/anchor/", "UI FOR BEACH COMPUTER");
+            InitializeSelector(gameModeButtonsDict["GorillaTag"]);
+
+            SceneManager.sceneLoaded += OnSceneChange;
         }
 
-        void InitializeSelector(string name, string parentPath, string buttonPath, string gamemodesPath)
+        void OnSceneChange(Scene scene, LoadSceneMode loadMode)
+        {
+            if (gameModeButtonsDict.TryGetValue(scene.name, out var buttonData))
+            {
+                InitializeSelector(buttonData);
+            }
+        }
+
+        // void InitializeSelector(string name, Transform parent, string buttonPath, string gamemodesPath)
+        void InitializeSelector(GameModeSelectorPath gmPathData)
         {
             try
             {
-                var selector = new GameObject(name).AddComponent<GamemodeSelector>();
-                Transform parent = GameObject.Find(parentPath).transform;
+                Transform parent = GameObject.Find(gmPathData.transformToFind)?.transform;
+                var selector = new GameObject(gmPathData.name).AddComponent<GamemodeSelector>();
 
                 // child objects might be removed when gamemodes is released, keeping default behaviour for now
-                var ButtonParent = parent.Find(buttonPath);
+                var ButtonParent = parent.Find(gmPathData.buttonPath);
                 foreach (Transform child in ButtonParent)
                 {
                     if (child.gameObject.name.StartsWith("ENABLE FOR BETA"))
@@ -76,7 +166,7 @@ namespace Melontilla
                 }
 
                 // gameobject name for the text object changed but might change back after gamemodes is released
-                var GamemodesList = parent.Find(gamemodesPath);
+                var GamemodesList = parent.Find(gmPathData.gamemodesPath);
                 foreach (Transform child in GamemodesList)
                 {
                     if (child.gameObject.name.StartsWith("Game Mode List Text ENABLE FOR BETA"))
@@ -90,12 +180,12 @@ namespace Melontilla
             }
             catch (Exception e)
             {
-                Melon<MelontillaMod>.Logger.Error($"Failed to initialize {name}: {e}");
+                Debug.LogError($"Melontilla: Failed to initialize {name}: {e}");
             }
 
         }
 
-        List<Gamemode> GetGamemodes(List<PluginInfo> infos)
+        List<Gamemode> GetGamemodes(List<ModInfo> infos)
         {
             List<Gamemode> gamemodes = new List<Gamemode>();
             gamemodes.AddRange(DefaultModdedGamemodes);
@@ -115,42 +205,39 @@ namespace Melontilla
 
             return gamemodes;
         }
-        
-        List<PluginInfo> GetPluginInfos()
-        {
-            List<PluginInfo> infos = new List<PluginInfo>();
-            /* Used for custom gamemodes I'll come back to this later
-            foreach (var melonPlugin in MelonLoader.MelonPlugin.RegisteredMelons)
-            {
-                
-                if (melonPlugin.Info == null) continue;
-                MelonMod plugin = melonPlugin.Value.Instance;
-                if (plugin == null) continue;
-                Type type = plugin.GetType();
 
+        List<ModInfo> GetModInfos()
+        {
+            List<ModInfo> infos = new List<ModInfo>();
+            foreach (var info in MelonMod.RegisteredMelons)
+            {
+                if (info == null) continue;
+                MelonMod mod = info;
+                if (mod == null) continue;
+                Type type = mod.GetType();
 
                 IEnumerable<Gamemode> gamemodes = GetGamemodes(type);
 
                 if (gamemodes.Count() > 0)
                 {
-                    infos.Add(new PluginInfo
+                    infos.Add(new ModInfo
                     {
-                        Plugin = plugin,
+                        Mod = mod,
                         Gamemodes = gamemodes.ToArray(),
-                        OnGamemodeJoin = CreateJoinLeaveAction(plugin, type, typeof(ModdedGamemodeJoinAttribute)),
-                        OnGamemodeLeave = CreateJoinLeaveAction(plugin, type, typeof(ModdedGamemodeLeaveAttribute))
+                        OnGamemodeJoin = CreateJoinLeaveAction(mod, type, typeof(ModdedGamemodeJoinAttribute)),
+                        OnGamemodeLeave = CreateJoinLeaveAction(mod, type, typeof(ModdedGamemodeLeaveAttribute))
                     });
                 }
             }
-            */
+
             return infos;
         }
 
-        Action<string> CreateJoinLeaveAction(MelonMod plugin, Type baseType, Type attribute)
+        Action<string> CreateJoinLeaveAction(MelonMod mod, Type baseType, Type attribute)
         {
             ParameterExpression param = Expression.Parameter(typeof(string));
             ParameterExpression[] paramExpression = new ParameterExpression[] { param };
-            ConstantExpression instance = Expression.Constant(plugin);
+            ConstantExpression instance = Expression.Constant(mod);
             BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
             Action<string> action = null;
@@ -203,40 +290,69 @@ namespace Melontilla
         void AddGamemodeToPrefabPool(Gamemode gamemode)
         {
             if (gamemode.GameManager is null) return;
+            if (gtGameModeKeyByName.ContainsKey(gamemode.GamemodeString) || gtGameModeKeyByName.ContainsKey(gamemode.DisplayName))
+            {
+                Debug.LogError($"game with name \"{gamemode.GamemodeString}\" or \"{gamemode.DisplayName}\" already exists");
+                return;
+            }
+
+            Type gmType = gamemode.GameManager;
+            if (gmType == null || !gmType.IsSubclassOf(typeof(GorillaGameManager)))
+            {
+                GameModeType? gmKey = gamemode.BaseGamemode switch
+                {
+                    BaseGamemode.Casual => GameModeType.Casual,
+                    BaseGamemode.Infection => GameModeType.Infection,
+                    BaseGamemode.Hunt => GameModeType.Hunt,
+                    BaseGamemode.Paintbrawl => GameModeType.Battle,
+                    _ => null
+                };
+
+                if (gmKey == null)
+                {
+                    return;
+                }
+
+                gtGameModeKeyByName[gamemode.GamemodeString] = (int)gmKey;
+                gtGameModeKeyByName[gamemode.DisplayName] = (int)gmKey;
+                gtGameModeNames.Add(gamemode.DisplayName);
+                return;
+            }
 
             GameObject prefab = new GameObject(gamemode.ID);
             prefab.SetActive(false);
-            prefab.AddComponent(gamemode.GameManager);
-            prefab.AddComponent<PhotonView>();
+            var gameMode = prefab.AddComponent(gamemode.GameManager) as GorillaGameManager;
+            int gameModeKey = (int)gameMode.GameType();
 
-            DefaultPool pool = PhotonNetwork.PrefabPool as DefaultPool;
-            pool.ResourceCache.Add(BasePrefabPath + prefab.name, prefab);
+            if (gtGameModeTable.ContainsKey(gameModeKey))
+            {
+                Debug.LogError($"GameMode {gtGameModeTable[gameModeKey].GameModeName()} is already using GameType {gameModeKey}");
+                GameObject.Destroy(prefab);
+                return;
+            }
+
+            gtGameModeTable[gameModeKey] = gameMode;
+            gtGameModeKeyByName[gamemode.GamemodeString] = gameModeKey;
+            gtGameModeKeyByName[gamemode.DisplayName] = gameModeKey;
+            gtGameModeNames.Add(gamemode.DisplayName);
+            gtGameModes.Add(gameMode);
+
+            prefab.transform.SetParent(moddedGameModesObject.transform);
+            prefab.SetActive(true);
+
         }
 
         internal void OnRoomJoin(object sender, Events.RoomJoinedArgs args)
         {
             string gamemode = args.Gamemode;
 
-            if (PhotonNetwork.IsMasterClient)
+            foreach (var modInfo in modInfos)
             {
-                foreach (Gamemode g in Gamemodes.Where(x => x.GameManager != null))
-                {
-                    if (gamemode.Contains(g.ID))
-                    {
-                        GameObject go = PhotonNetwork.InstantiateRoomObject(BasePrefabPath + g.ID, Vector3.zero, Quaternion.identity);
-                        go.SetActive(true);
-                        break;
-                    }
-                }
-            }
-
-            foreach (var pluginInfo in pluginInfos)
-            {
-                if (pluginInfo.Gamemodes.Any(x => gamemode.Contains(x.GamemodeString)))
+                if (modInfo.Gamemodes.Any(x => gamemode.Contains(x.GamemodeString)))
                 {
                     try
                     {
-                        pluginInfo.OnGamemodeJoin?.Invoke(gamemode);
+                        modInfo.OnGamemodeJoin?.Invoke(gamemode);
                     }
                     catch (Exception e)
                     {
@@ -250,13 +366,13 @@ namespace Melontilla
         {
             string gamemode = args.Gamemode;
 
-            foreach (var pluginInfo in pluginInfos)
+            foreach (var modInfo in modInfos)
             {
-                if (pluginInfo.Gamemodes.Any(x => gamemode.Contains(x.GamemodeString)))
+                if (modInfo.Gamemodes.Any(x => gamemode.Contains(x.GamemodeString)))
                 {
                     try
                     {
-                        pluginInfo.OnGamemodeLeave?.Invoke(gamemode);
+                        modInfo.OnGamemodeLeave?.Invoke(gamemode);
                     }
                     catch (Exception e)
                     {

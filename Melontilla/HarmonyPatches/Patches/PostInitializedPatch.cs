@@ -15,7 +15,6 @@ namespace Melontilla.HarmonyPatches
 
         private static void Postfix()
         {
-            Melon<MelontillaMod>.Logger.Msg("init postfix running");
             // await Task.Yield();
             events.TriggerGameInitialized();
         }

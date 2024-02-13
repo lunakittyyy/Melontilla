@@ -6,16 +6,16 @@ using static Cinemachine.CinemachineTriggerAction.ActionSettings;
 
 namespace Melontilla
 {
-    public class PluginInfo
+    public class ModInfo
     {
-        public MelonMod Plugin { get; set; }
+        public MelonMod Mod { get; set; }
         public Gamemode[] Gamemodes { get; set; }
         public Action<string> OnGamemodeJoin { get; set; }
         public Action<string> OnGamemodeLeave { get; set; }
 
         public override string ToString()
         {
-            return $"{Plugin.Info.Name} [{string.Join(", ", Gamemodes.Select(x => x.DisplayName))}]";
+            return $"{Mod.Info.Name} [{string.Join(", ", Gamemodes.Select(x => x.DisplayName))}]";
         }
     }
 }

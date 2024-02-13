@@ -5,8 +5,7 @@ using UnityEngine.UI;
 using System.Linq;
 using GorillaNetworking;
 using Melontilla.Models;
-using UnityEngine.Events;
-using static Cinemachine.CinemachineTriggerAction.ActionSettings;
+using GorillaExtensions;
 
 namespace Melontilla
 {
@@ -46,7 +45,7 @@ namespace Melontilla
             cube.SetActive(false);
             MeshFilter meshFilter = cube.GetComponent<MeshFilter>();
 
-            GameObject CreatePageButton(string text, UnityAction onPressed)
+            GameObject CreatePageButton(string text, Action onPressed)
             {
                 GameObject button = GameObject.Instantiate(templateButton.transform.childCount == 0 ? fallbackTemplateButton : templateButton);
                 button.GetComponent<MeshFilter>().mesh = meshFilter.mesh;
@@ -63,15 +62,13 @@ namespace Melontilla
                     buttonText.transform.localScale = Vector3.Scale(buttonText.transform.localScale, new Vector3(2, 2, 1));
                 }
 
-                UnityEvent buttonEvent = new UnityEvent();
-                buttonEvent.AddListener(onPressed);
-
                 GameObject.Destroy(button.GetComponent<ModeSelectButton>());
-                button.AddComponent<GorillaPressableButton>().onPressButton = buttonEvent;
+                button.AddComponent<PageButton>().onPressed += onPressed;
+                button.GetComponent<PageButton>().onPressButton = new UnityEngine.Events.UnityEvent();
 
                 if (!button.GetComponentInParent<Canvas>())
                 {
-                    Canvas canvas = button.transform.parent.gameObject.AddComponent<Canvas>();
+                    Canvas canvas = button.transform.parent.gameObject.GetOrAddComponent<Canvas>();
                     canvas.renderMode = RenderMode.WorldSpace;
                 }
 
@@ -136,7 +133,7 @@ namespace Melontilla
             }
             gamemodesText.text = displayText;
 
-            GorillaComputer.instance.OnModeSelectButtonPress(GorillaComputer.instance.currentGameMode, GorillaComputer.instance.leftHanded);
+            GorillaComputer.instance.OnModeSelectButtonPress(GorillaComputer.instance.currentGameMode.Value, GorillaComputer.instance.leftHanded);
         }
     }
 }
