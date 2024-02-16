@@ -9,10 +9,8 @@ using UnityEngine.SceneManagement;
 
 using GorillaNetworking;
 using MelonLoader;
-using HarmonyLib;
 
 using Melontilla.Models;
-using Melontilla;
 
 namespace Melontilla
 {

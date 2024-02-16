@@ -1,8 +1,5 @@
-﻿
-using HarmonyLib;
-using MelonLoader;
+﻿using HarmonyLib;
 using Photon.Pun;
-using UnityEngine;
 
 namespace Melontilla.HarmonyPatches
 {

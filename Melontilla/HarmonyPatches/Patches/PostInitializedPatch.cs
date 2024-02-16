@@ -1,9 +1,4 @@
-﻿using UnityEngine;
-using HarmonyLib;
-using System.Collections;
-using System.Threading.Tasks;
-using Melontilla;
-using MelonLoader;
+﻿using HarmonyLib;
 
 namespace Melontilla.HarmonyPatches
 {

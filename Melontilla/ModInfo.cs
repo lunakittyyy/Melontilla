@@ -2,7 +2,6 @@
 using System.Linq;
 using MelonLoader;
 using Melontilla.Models;
-using static Cinemachine.CinemachineTriggerAction.ActionSettings;
 
 namespace Melontilla
 {

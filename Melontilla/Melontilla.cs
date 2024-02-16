@@ -1,12 +1,7 @@
-﻿using System;
-using MelonLoader;
+﻿using MelonLoader;
 using Melontilla.HarmonyPatches;
 using Melontilla.Utils;
 using UnityEngine;
-using System.Linq;
-using Photon.Realtime;
-using Photon.Pun;
-using System.Collections.Generic;
 
 namespace Melontilla
 {

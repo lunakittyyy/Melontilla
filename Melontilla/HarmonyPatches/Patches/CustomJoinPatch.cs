@@ -1,7 +1,5 @@
 ﻿using HarmonyLib;
-using UnityEngine;
 using GorillaNetworking;
-using MelonLoader;
 
 namespace Melontilla.HarmonyPatches
 {
