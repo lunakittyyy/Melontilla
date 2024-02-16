@@ -10,7 +10,6 @@ namespace Melontilla.HarmonyPatches
     {
         private static void Prefix(GorillaScoreboardSpawner __instance)
         {
-            Melon<MelontillaMod>.Logger.Msg("scoreboard prefix running");
             if (__instance.notInRoomText == null)
             {
                 __instance.notInRoomText = new GameObject();

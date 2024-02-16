@@ -8,7 +8,7 @@ using Melontilla;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: MelonInfo(typeof(MelontillaMod), "Melontilla", "1.6.12", "Luna")]
+[assembly: MelonInfo(typeof(MelontillaMod), "Melontilla", "0.1.0", "Luna")]
 [assembly: MelonGame("Another Axiom", "Gorilla Tag")]
 [assembly: AssemblyTitle("Melontilla")]
 [assembly: AssemblyDescription("A port of Utilla to MelonLoader")]
