@@ -41,7 +41,6 @@
     <Compile Include="GamemodeSelector.cs" />
     <Compile Include="HarmonyPatches\Patches\CustomJoinPatch.cs" />
     <Compile Include="HarmonyPatches\Patches\GorillaLevelScreenPatch.cs" />
-    <Compile Include="HarmonyPatches\Patches\MatchmakingRegionPatch.cs" />
     <Compile Include="HarmonyPatches\Patches\PhotonNetworkPatch.cs" />
     <Compile Include="HarmonyPatches\Patches\PostInitializedPatch.cs" />
     <Compile Include="HarmonyPatches\Patches\ScoreboardPatch.cs" />
